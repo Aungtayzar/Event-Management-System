@@ -73,4 +73,56 @@ class Booking extends Model
     {
         return !$this->isCancelled();
     }
+
+    public function getStatusDisplayAttribute(): string
+    {
+        if ($this->isCancelled()) {
+            $cancelledBy = $this->cancellation?->cancelledBy;
+            if ($cancelledBy && $cancelledBy->role === 'admin') {
+                return 'Cancelled by Admin';
+            }
+            return 'Cancelled';
+        }
+        return ucfirst($this->status);
+    }
+
+    public function getStatusColorAttribute(): string
+    {
+        return match ($this->status) {
+            'confirmed' => 'bg-green-100 text-green-800',
+            'cancelled' => 'bg-red-100 text-red-800',
+            'pending' => 'bg-yellow-100 text-yellow-800',
+            default => 'bg-gray-100 text-gray-800'
+        };
+    }
+
+    public function getCancellationDisplayAttribute(): ?string
+    {
+        if (!$this->isCancelled() || !$this->cancellation) {
+            return null;
+        }
+
+        $reason = $this->cancellation->reason;
+        if ($this->cancellation->notes) {
+            return "Cancelled by Admin – {$this->cancellation->notes}";
+        }
+        return "Cancelled by Admin – {$reason}";
+    }
+
+    public function getRefundDisplayAttribute(): ?string
+    {
+        if (!$this->isCancelled() || !$this->refund_amount || $this->refund_amount <= 0) {
+            return null;
+        }
+
+        $refundStatus = $this->cancellation?->refund_status ?? 'pending';
+        $amount = number_format($this->refund_amount, 2);
+
+        return match ($refundStatus) {
+            'completed' => "Refund of \${$amount} has been processed.",
+            'pending' => "Refund of \${$amount} has been initiated. It may take 5–7 days to reflect.",
+            'failed' => "Refund of \${$amount} failed. Please contact support.",
+            default => "Refund of \${$amount} is being processed."
+        };
+    }
 }

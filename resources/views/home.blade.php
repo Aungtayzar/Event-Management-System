@@ -125,7 +125,7 @@
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div class="text-center p-6">
+            <div class="text-center p-6 shadow-md bg-slate-100 rounded-md">
                 <div
                     class="w-16 h-16 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center mx-auto mb-4">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24"
@@ -139,7 +139,7 @@
                     location to find the perfect event for you.</p>
             </div>
 
-            <div class="text-center p-6">
+            <div class="text-center p-6 bg-slate-100 rounded-md">
                 <div
                     class="w-16 h-16 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center mx-auto mb-4">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24"
@@ -153,7 +153,7 @@
                     complete your purchase in minutes.</p>
             </div>
 
-            <div class="text-center p-6">
+            <div class="text-center p-6 bg-slate-100 rounded-md">
                 <div
                     class="w-16 h-16 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center mx-auto mb-4">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24"

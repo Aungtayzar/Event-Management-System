@@ -63,10 +63,22 @@
                             'refunded' => 'bg-blue-100 text-blue-800',
                             ];
                             @endphp
-                            <span
-                                class="px-3 py-1 text-sm font-semibold rounded-full {{ $statusColors[$booking->status] ?? 'bg-gray-100 text-gray-800' }}">
-                                {{ ucfirst($booking->status) }}
+                            <span class="px-3 py-1 text-sm font-semibold rounded-full {{ $booking->status_color }}">
+                                @if($booking->isCancelled())
+                                <i class="fas fa-times-circle mr-1"></i>
+                                {{ $booking->status_display }}
+                                @else
+                                <i class="fas fa-check-circle mr-1"></i>
+                                {{ $booking->status_display }}
+                                @endif
                             </span>
+
+                            @if($booking->cancelled_at)
+                            <p class="text-sm text-gray-500 mt-1">
+                                <i class="fas fa-clock mr-1"></i>
+                                Cancelled on {{ $booking->cancelled_at->format('M d, Y \a\t g:i A') }}
+                            </p>
+                            @endif
                         </div>
 
                         <div>

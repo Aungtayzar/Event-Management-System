@@ -39,10 +39,14 @@
                         </div>
                         <!-- Booking Status Badge -->
                         <div class="absolute top-4 right-4">
-                            <span
-                                class="bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-full flex items-center">
-                                <i class="fas fa-check-circle mr-1"></i>
-                                Confirmed
+                            <span class="text-xs font-bold px-2 py-1 rounded-full flex items-center {{ $booking->status_color }}">
+                                @if($booking->isCancelled())
+                                    <i class="fas fa-times-circle mr-1"></i>
+                                    {{ $booking->status_display }}
+                                @else
+                                    <i class="fas fa-check-circle mr-1"></i>
+                                    {{ $booking->status_display }}
+                                @endif
                             </span>
                         </div>
                     </div>
@@ -64,7 +68,7 @@
                         </div>
 
                         <!-- Ticket Information -->
-                        <div class="bg-gray-50 rounded-lg p-4 border-l-4 border-indigo-500">
+                        <div class="bg-gray-50 rounded-lg p-4 border-l-4 {{ $booking->isCancelled() ? 'border-red-500' : 'border-indigo-500' }}">
                             <div class="space-y-2">
                                 <!-- Ticket Type -->
                                 <div class="flex items-center justify-between">
@@ -92,22 +96,70 @@
                                 <div class="flex items-center justify-between border-t border-gray-200 pt-2 mt-2">
                                     <div class="flex items-center">
                                         <i class="fas fa-dollar-sign text-green-500 mr-2"></i>
-                                        <span class="text-sm font-medium text-gray-700">Total Paid</span>
+                                        <span class="text-sm font-medium text-gray-700">{{ $booking->isCancelled() ? 'Original Price' : 'Total Paid' }}</span>
                                     </div>
-                                    <span class="text-lg font-bold text-green-600">
+                                    <span class="text-lg font-bold {{ $booking->isCancelled() ? 'text-gray-600' : 'text-green-600' }}">
                                         ${{ number_format($booking->total_price, 2) }}
                                     </span>
                                 </div>
                             </div>
                         </div>
 
+                        @if($booking->isCancelled())
+                            <!-- Cancellation Information -->
+                            <div class="bg-red-50 rounded-lg p-4 border border-red-200">
+                                @if($booking->cancellation_display)
+                                    <div class="mb-3">
+                                        <div class="flex items-start">
+                                            <i class="fas fa-exclamation-circle text-red-500 mt-1 mr-2"></i>
+                                            <div>
+                                                <p class="text-sm font-medium text-red-800">Cancellation Reason</p>
+                                                <p class="text-sm text-red-700 mt-1">{{ $booking->cancellation_display }}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endif
+
+                                @if($booking->refund_display)
+                                    <div class="border-t border-red-200 pt-3">
+                                        <div class="flex items-start">
+                                            <i class="fas fa-money-bill-wave text-green-500 mt-1 mr-2"></i>
+                                            <div>
+                                                <p class="text-sm font-medium text-green-800">Refund Information</p>
+                                                <p class="text-sm text-green-700 mt-1">{{ $booking->refund_display }}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endif
+
+                                @if($booking->cancelled_at)
+                                    <div class="border-t border-red-200 pt-3 mt-3">
+                                        <div class="flex items-center">
+                                            <i class="fas fa-clock text-gray-400 mr-2"></i>
+                                            <span class="text-xs text-gray-600">
+                                                Cancelled on {{ $booking->cancelled_at->format('M d, Y \a\t g:i A') }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                @endif
+                            </div>
+                        @endif
+
                         <!-- Action Buttons -->
                         <div class="flex space-x-2 pt-2">
-                            <a href="{{ route('events.show', $booking->event) }}"
-                                class="flex-1 bg-indigo-100 hover:bg-indigo-200 text-indigo-700 font-medium py-2 px-4 rounded-lg transition duration-300 ease-in-out flex items-center justify-center text-sm">
-                                <i class="fas fa-eye mr-2"></i>
-                                View Event
-                            </a>
+                            @if($booking->isCancelled())
+                                <a href="{{ route('events.show', $booking->event) }}"
+                                    class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg transition duration-300 ease-in-out flex items-center justify-center text-sm">
+                                    <i class="fas fa-redo mr-2"></i>
+                                    Book Again
+                                </a>
+                            @else
+                                <a href="{{ route('events.show', $booking->event) }}"
+                                    class="flex-1 bg-indigo-100 hover:bg-indigo-200 text-indigo-700 font-medium py-2 px-4 rounded-lg transition duration-300 ease-in-out flex items-center justify-center text-sm">
+                                    <i class="fas fa-eye mr-2"></i>
+                                    View Event
+                                </a>
+                            @endif
                         </div>
 
                         <!-- Booking Reference -->

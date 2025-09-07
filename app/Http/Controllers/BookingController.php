@@ -15,7 +15,12 @@ class BookingController extends Controller
 
     public function index()
     {
-        $bookings = Auth::user()->bookings()->with('event', 'ticketType')->get();
+        // Include cancelled bookings in history, load all necessary relationships
+        $bookings = Auth::user()->bookings()
+            ->with(['event', 'ticketType', 'cancellation.cancelledBy'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
         return view('bookings.index', compact('bookings'));
     }
 
@@ -30,15 +35,23 @@ class BookingController extends Controller
         if ($ticketType->quantity < $validated['quantity']) {
             return back()->withErrors(['quantity' => 'Not enough tickets available.']);
         }
-        $existBooking = Booking::where('user_id', Auth::user()->id)->where('event_id', $event->id)->where('ticket_type_id', $validated['ticket_type_id'])->first();
-        if ($existBooking) {
-            $totalQuantity = (int) $existBooking->quantity + (int) $validated['quantity'];
-            $existBooking->update([
+        // Check for existing active booking (not cancelled)
+        $activeBooking = Booking::where('user_id', Auth::user()->id)
+            ->where('event_id', $event->id)
+            ->where('ticket_type_id', $validated['ticket_type_id'])
+            ->where('status', '!=', 'cancelled')
+            ->first();
+
+        if ($activeBooking) {
+            // If there's an active booking, add quantity to it
+            $totalQuantity = (int) $activeBooking->quantity + (int) $validated['quantity'];
+            $activeBooking->update([
                 'quantity' => $totalQuantity,
                 'total_price' => $ticketType->price * $totalQuantity,
             ]);
-            $booking = $existBooking;
+            $booking = $activeBooking;
         } else {
+            // If no active booking exists, create new booking
             $booking = Booking::create([
                 'user_id' => Auth::user()->id,
                 'event_id' => $event->id,
@@ -52,6 +65,8 @@ class BookingController extends Controller
 
         // Send confirmation email
         Auth::user()->notify(new BookingRegister($booking));
+
+
 
         return redirect()->route('bookings.index')->with('success', 'Booking confirmed.');
     }
