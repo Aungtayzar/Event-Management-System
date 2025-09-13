@@ -1,4 +1,5 @@
 1. I need to fix edit button and delete button action for admin role. Can't edit it show 403 Unauthorized. (completed)
-2. I need to check admin event management properly created or deleted or edited. 
-3. I need to make seeder for tickettype.
+2. I need to check admin event management properly created or deleted or edited. (completed)
+3. I need to make seeder for tickettype. (completed)
 4. Need to add user management fuctionality in Admin panel. (completed)
+5. Event date is greater than today what should i do. (Important)

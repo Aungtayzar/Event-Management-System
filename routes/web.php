@@ -68,6 +68,11 @@ Route::get('/events/{event}', [EventsController::class, 'show'])->name('events.s
 Route::middleware('auth')->group(function () {
     Route::get('/bookings', [BookingController::class, 'index'])->name('bookings.index');
     Route::post('/events/{event}/bookings', [BookingController::class, 'store'])->name('bookings.store');
+
+    //profile Routes
+    Route::get('/profile', [App\Http\Controllers\ProfileController::class, 'show'])->name('profile.show');
+    Route::put('/profile', [App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile/picture', [App\Http\Controllers\ProfileController::class, 'removeProfilePicture'])->name('profile.remove-picture');
 });
 
 

@@ -22,7 +22,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'role'
+        'role',
+        'profile_picture'
     ];
 
     /**
@@ -48,15 +49,15 @@ class User extends Authenticatable
         ];
     }
 
-    public function events():HasMany
+    public function events(): HasMany
     {
         return $this->hasMany(Event::class, 'organizer_id');
     }
-    public function bookings():HasMany
+    public function bookings(): HasMany
     {
         return $this->hasMany(Booking::class);
     }
-    
+
     public function isAdmin()
     {
         return $this->role === 'admin';
@@ -65,5 +66,18 @@ class User extends Authenticatable
     public function isOrganizer()
     {
         return $this->role === 'organizer';
+    }
+
+    /**
+     * Get the profile picture URL.
+     */
+    public function getProfilePictureUrlAttribute()
+    {
+        if ($this->profile_picture) {
+            return asset('storage/' . $this->profile_picture);
+        }
+
+        // Return default avatar if no profile picture
+        return 'https://ui-avatars.com/api/?name=' . urlencode($this->name) . '&color=7F9CF5&background=EBF4FF';
     }
 }

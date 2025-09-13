@@ -4,6 +4,11 @@
         <div class="flex justify-between items-center mb-8">
             <h1 class="text-3xl font-bold text-gray-900">Booking Management</h1>
             <div class="flex gap-3">
+                <a href="{{ route('admin.dashboard') }}"
+                    class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold rounded-lg shadow-md transition-colors duration-300">
+                    <i class="fas fa-arrow-left mr-2"></i>
+                    Back to Dashboard
+                </a>
                 <a href="{{ route('admin.bookings.export', request()->all()) }}"
                     class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md transition duration-200">
                     <i class="fas fa-download mr-2"></i>Export CSV

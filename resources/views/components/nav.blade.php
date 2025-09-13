@@ -3,7 +3,14 @@
         <div class="flex justify-between h-16">
             <!-- Logo/Brand -->
             <div class="flex-shrink-0 flex items-center">
-                <a href="{{ route('home') }}" class="text-xl font-bold text-indigo-700">Event Platform</a>
+                <a href="{{ route('home') }}"
+                    class="flex items-center text-xl font-bold text-indigo-700 hover:text-indigo-800 transition duration-150">
+                    <!-- Project Icon -->
+                    <div class="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center mr-3 shadow-md">
+                        <i class="fas fa-calendar-alt text-white text-lg"></i>
+                    </div>
+                    <span>Event Platform</span>
+                </a>
             </div>
 
             <!-- Mobile menu button -->
@@ -34,22 +41,18 @@
                     Home
                 </a>
 
-                @auth
-                <span class="text-sm font-medium text-gray-700">Welcome, {{ Auth::user()->name }}</span>
-
                 <a href="{{ route('events.index') }}"
                     class="text-sm font-medium text-indigo-600 hover:text-indigo-800 transition duration-150">
                     <i class="fas fa-tachometer-alt mr-1"></i>Find Event
                 </a>
 
+                @auth
+                <span class="text-sm font-medium text-gray-700">Welcome, {{ Auth::user()->name }}</span>
+
                 @if(Auth::user()->isAdmin())
                 <a href="{{ route('admin.dashboard') }}"
                     class="text-sm font-medium text-indigo-600 hover:text-indigo-800 transition duration-150">
                     <i class="fas fa-tachometer-alt mr-1"></i>Admin Dashboard
-                </a>
-                <a href="{{ route('admin.bookings.index') }}"
-                    class="text-sm font-medium text-indigo-600 hover:text-indigo-800 transition duration-150">
-                    <i class="fas fa-cog mr-1"></i>Manage Bookings
                 </a>
                 @endif
 
@@ -63,6 +66,13 @@
                 <a href="{{ route('bookings.index') }}"
                     class="text-sm font-medium text-indigo-600 hover:text-indigo-800 transition duration-150">
                     <i class="fas fa-ticket-alt mr-1"></i>My Bookings
+                </a>
+
+                <a href="{{ route('profile.show') }}"
+                    class="flex items-center text-sm font-medium text-indigo-600 hover:text-indigo-800 transition duration-150">
+                    <img src="{{ Auth::user()->profile_picture_url }}" alt="{{ Auth::user()->name }}"
+                        class="w-10 h-10 rounded-full object-cover mr-2 border border-indigo-200">
+                    Profile
                 </a>
 
                 <form action="{{ route('logout') }}" method="POST" class="inline">
@@ -97,10 +107,6 @@
                 class="block px-4 py-2 text-base font-medium text-indigo-700 hover:bg-gray-50">
                 <i class="fas fa-tachometer-alt mr-2"></i>Admin Dashboard
             </a>
-            <a href="{{ route('admin.bookings.index') }}"
-                class="block px-4 py-2 text-base font-medium text-indigo-700 hover:bg-gray-50">
-                <i class="fas fa-cog mr-2"></i>Manage Bookings
-            </a>
             @endif
 
             @if(Auth::user()->isOrganizer())
@@ -113,6 +119,13 @@
             <a href="{{ route('bookings.index') }}"
                 class="block px-4 py-2 text-base font-medium text-indigo-700 hover:bg-gray-50">
                 <i class="fas fa-ticket-alt mr-2"></i>My Bookings
+            </a>
+
+            <a href="{{ route('profile.show') }}"
+                class="flex items-center px-4 py-2 text-base font-medium text-indigo-700 hover:bg-gray-50">
+                <img src="{{ Auth::user()->profile_picture_url }}" alt="{{ Auth::user()->name }}"
+                    class="w-5 h-5 rounded-full object-cover mr-2 border border-indigo-200">
+                Profile
             </a>
 
             <form action="{{ route('logout') }}" method="POST" class="block">

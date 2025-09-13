@@ -93,6 +93,14 @@ class EventsController extends Controller
     // Admin delete
     public function adminDestroy(Event $event)
     {
+        // Check if event has any bookings
+        $bookingsCount = $event->bookings()->count();
+
+        if ($bookingsCount > 0) {
+            return redirect()->route('admin.events.index')
+                ->with('error', "Cannot delete event '{$event->title}'. It has {$bookingsCount} booking. Please cancel all bookings of this event.");
+        }
+
         // Delete banner image if exists
         if ($event->banner_image) {
             Storage::delete('public/' . $event->banner_image);
