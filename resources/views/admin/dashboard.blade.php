@@ -25,6 +25,7 @@
                         <div>
                             <p class="text-sm font-medium text-gray-600 mb-1">Total Events</p>
                             <p class="text-3xl font-bold text-indigo-600">{{ $stats['total_events'] }}</p>
+                            <p class="text-xs text-gray-500">{{ $stats['published_events'] }} published, {{ $stats['upcoming_events'] }} upcoming</p>
                         </div>
                         <div class="bg-indigo-100 rounded-full p-3">
                             <i class="fas fa-calendar-alt text-indigo-600 text-xl"></i>
@@ -38,6 +39,7 @@
                         <div>
                             <p class="text-sm font-medium text-gray-600 mb-1">Total Users</p>
                             <p class="text-3xl font-bold text-green-600">{{ $stats['total_users'] }}</p>
+                            <p class="text-xs text-gray-500">{{ $stats['total_organizers'] }} organizers</p>
                         </div>
                         <div class="bg-green-100 rounded-full p-3">
                             <i class="fas fa-users text-green-600 text-xl"></i>
@@ -51,7 +53,7 @@
                         <div>
                             <p class="text-sm font-medium text-gray-600 mb-1">Total Bookings</p>
                             <p class="text-3xl font-bold text-blue-600">{{ $stats['total_bookings'] }}</p>
-                            <p class="text-xs text-gray-500">{{ $stats['this_month_bookings'] }} this month</p>
+                            <p class="text-xs text-gray-500">{{ $stats['today_bookings'] }} today, {{ $stats['this_week_bookings'] }} this week</p>
                         </div>
                         <div class="bg-blue-100 rounded-full p-3">
                             <i class="fas fa-ticket-alt text-blue-600 text-xl"></i>
@@ -65,7 +67,7 @@
                         <div>
                             <p class="text-sm font-medium text-gray-600 mb-1">Active Bookings</p>
                             <p class="text-3xl font-bold text-emerald-600">{{ $stats['active_bookings'] }}</p>
-                            <p class="text-xs text-gray-500">{{ $stats['pending_bookings'] }} pending</p>
+                            <p class="text-xs text-gray-500">{{ $stats['pending_bookings'] }} pending, {{ $stats['cancelled_bookings'] }} cancelled</p>
                         </div>
                         <div class="bg-emerald-100 rounded-full p-3">
                             <i class="fas fa-check-circle text-emerald-600 text-xl"></i>
@@ -78,9 +80,8 @@
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-sm font-medium text-gray-600 mb-1">Total Revenue</p>
-                            <p class="text-3xl font-bold text-purple-600">${{ number_format($stats['total_revenue'], 0)
-                                }}</p>
-                            <p class="text-xs text-gray-500">{{ $stats['cancelled_bookings'] }} cancelled</p>
+                            <p class="text-3xl font-bold text-purple-600">${{ number_format($stats['total_revenue'], 0) }}</p>
+                            <p class="text-xs text-gray-500">${{ number_format($stats['this_month_revenue'], 0) }} this month</p>
                         </div>
                         <div class="bg-purple-100 rounded-full p-3">
                             <i class="fas fa-dollar-sign text-purple-600 text-xl"></i>
@@ -105,7 +106,7 @@
                                 <div class="flex items-center justify-between">
                                     <div>
                                         <h3 class="text-lg font-semibold mb-2">Manage Categories</h3>
-                                        <p class="text-purple-100 text-sm">Create and edit event categories</p>
+                                        <p class="text-purple-100 text-sm">{{ $stats['total_categories'] }} categories created</p>
                                     </div>
                                     <i class="fas fa-tags text-2xl opacity-80 group-hover:opacity-100"></i>
                                 </div>
@@ -117,7 +118,7 @@
                                 <div class="flex items-center justify-between">
                                     <div>
                                         <h3 class="text-lg font-semibold mb-2">Manage Events</h3>
-                                        <p class="text-indigo-100 text-sm">View and moderate events</p>
+                                        <p class="text-indigo-100 text-sm">{{ $stats['total_events'] }} events, {{ $stats['upcoming_events'] }} upcoming</p>
                                     </div>
                                     <i class="fas fa-calendar-alt text-2xl opacity-80 group-hover:opacity-100"></i>
                                 </div>
@@ -129,7 +130,7 @@
                                 <div class="flex items-center justify-between">
                                     <div>
                                         <h3 class="text-lg font-semibold mb-2">User Management</h3>
-                                        <p class="text-green-100 text-sm">Manage user accounts and roles</p>
+                                        <p class="text-green-100 text-sm">{{ $stats['total_users'] }} users, {{ $stats['total_organizers'] }} organizers</p>
                                     </div>
                                     <i class="fas fa-users text-2xl opacity-80 group-hover:opacity-100"></i>
                                 </div>
@@ -141,7 +142,7 @@
                                 <div class="flex items-center justify-between">
                                     <div>
                                         <h3 class="text-lg font-semibold mb-2">Manage Bookings</h3>
-                                        <p class="text-blue-100 text-sm">View, edit and cancel bookings</p>
+                                        <p class="text-blue-100 text-sm">{{ $stats['total_bookings'] }} total, {{ $stats['pending_bookings'] }} pending</p>
                                     </div>
                                     <i class="fas fa-ticket-alt text-2xl opacity-80 group-hover:opacity-100"></i>
                                 </div>
@@ -153,7 +154,7 @@
                                 <div class="flex items-center justify-between">
                                     <div>
                                         <h3 class="text-lg font-semibold mb-2">Booking Reports</h3>
-                                        <p class="text-yellow-100 text-sm">Export detailed booking analytics</p>
+                                        <p class="text-yellow-100 text-sm">${{ number_format($stats['total_revenue'], 0) }} total revenue</p>
                                     </div>
                                     <i class="fas fa-chart-bar text-2xl opacity-80 group-hover:opacity-100"></i>
                                 </div>
@@ -170,53 +171,26 @@
                             Recent Activity
                         </h2>
                         <div class="space-y-4">
-                            <!-- Activity Item -->
+                            @forelse($recentActivities as $activity)
+                            <!-- Dynamic Activity Item -->
                             <div class="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg">
-                                <div class="bg-green-100 rounded-full p-2">
-                                    <i class="fas fa-plus text-green-600 text-sm"></i>
+                                <div class="{{ $activity['bg_color'] }} rounded-full p-2">
+                                    <i class="{{ $activity['icon'] }} {{ $activity['icon_color'] }} text-sm"></i>
                                 </div>
                                 <div class="flex-1">
-                                    <p class="text-sm font-medium text-gray-800">New event created</p>
-                                    <p class="text-xs text-gray-600">Tech Conference 2024</p>
-                                    <p class="text-xs text-gray-500">2 hours ago</p>
+                                    <p class="text-sm font-medium text-gray-800">{{ $activity['title'] }}</p>
+                                    <p class="text-xs text-gray-600">{{ $activity['description'] }}</p>
+                                    <p class="text-xs text-gray-500">{{ $activity['time_human'] }}</p>
                                 </div>
                             </div>
-
-                            <!-- Activity Item -->
-                            <div class="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg">
-                                <div class="bg-blue-100 rounded-full p-2">
-                                    <i class="fas fa-user-plus text-blue-600 text-sm"></i>
-                                </div>
-                                <div class="flex-1">
-                                    <p class="text-sm font-medium text-gray-800">New user registered</p>
-                                    <p class="text-xs text-gray-600">john.doe@example.com</p>
-                                    <p class="text-xs text-gray-500">4 hours ago</p>
-                                </div>
+                            @empty
+                            <!-- No Activities -->
+                            <div class="text-center py-6">
+                                <i class="fas fa-clock text-4xl text-gray-300 mb-3"></i>
+                                <p class="text-gray-500 text-sm">No recent activities</p>
+                                <p class="text-gray-400 text-xs">Activity will appear here as users interact with your platform</p>
                             </div>
-
-                            <!-- Activity Item -->
-                            <div class="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg">
-                                <div class="bg-purple-100 rounded-full p-2">
-                                    <i class="fas fa-tags text-purple-600 text-sm"></i>
-                                </div>
-                                <div class="flex-1">
-                                    <p class="text-sm font-medium text-gray-800">Category updated</p>
-                                    <p class="text-xs text-gray-600">Technology category</p>
-                                    <p class="text-xs text-gray-500">1 day ago</p>
-                                </div>
-                            </div>
-
-                            <!-- Activity Item -->
-                            <div class="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg">
-                                <div class="bg-yellow-100 rounded-full p-2">
-                                    <i class="fas fa-ticket-alt text-yellow-600 text-sm"></i>
-                                </div>
-                                <div class="flex-1">
-                                    <p class="text-sm font-medium text-gray-800">Multiple bookings</p>
-                                    <p class="text-xs text-gray-600">15 new bookings today</p>
-                                    <p class="text-xs text-gray-500">1 day ago</p>
-                                </div>
-                            </div>
+                            @endforelse
                         </div>
                     </div>
                 </div>

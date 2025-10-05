@@ -125,4 +125,33 @@ class Booking extends Model
             default => "Refund of \${$amount} is being processed."
         };
     }
+
+    // Static methods for dashboard statistics
+    public static function getMonthlyBookingsCount(): int
+    {
+        return static::whereRaw('EXTRACT(MONTH FROM created_at) = ?', [now()->month])
+            ->whereRaw('EXTRACT(YEAR FROM created_at) = ?', [now()->year])
+            ->count();
+    }
+
+    public static function getTodayBookingsCount(): int
+    {
+        return static::whereDate('created_at', today())->count();
+    }
+
+    public static function getWeeklyBookingsCount(): int
+    {
+        return static::whereBetween('created_at', [
+            now()->startOfWeek(),
+            now()->endOfWeek()
+        ])->count();
+    }
+
+    public static function getMonthlyRevenue(): float
+    {
+        return static::where('status', 'confirmed')
+            ->whereRaw('EXTRACT(MONTH FROM created_at) = ?', [now()->month])
+            ->whereRaw('EXTRACT(YEAR FROM created_at) = ?', [now()->year])
+            ->sum('total_price');
+    }
 }

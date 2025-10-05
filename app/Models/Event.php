@@ -44,4 +44,28 @@ class Event extends Model
     {
         return $this->date < now();
     }
+
+    /**
+     * Check if the event is upcoming (future date)
+     */
+    public function isUpcoming(): bool
+    {
+        return $this->date > now();
+    }
+
+    /**
+     * Get total bookings count for this event
+     */
+    public function totalBookings(): int
+    {
+        return $this->bookings()->count();
+    }
+
+    /**
+     * Get total revenue from confirmed bookings for this event
+     */
+    public function totalRevenue(): float
+    {
+        return $this->bookings()->where('status', 'confirmed')->sum('total_price');
+    }
 }

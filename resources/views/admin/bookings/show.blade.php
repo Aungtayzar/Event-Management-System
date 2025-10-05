@@ -191,11 +191,6 @@
                             <i class="fas fa-times mr-2"></i>Cancel Booking
                         </a>
                         @endif
-
-                        <a href="mailto:{{ $booking->user->email }}"
-                            class="w-full bg-gray-600 hover:bg-gray-700 text-white py-2 px-4 rounded-md transition duration-200 flex items-center justify-center">
-                            <i class="fas fa-envelope mr-2"></i>Email Customer
-                        </a>
                     </div>
                 </div>
 
