@@ -26,6 +26,11 @@ class BookingController extends Controller
 
     public function store(Request $request, Event $event)
     {
+        // Check if event date is in the past
+        if ($event->date < now()) {
+            return back()->withErrors(['event' => 'This event has already passed. Booking is no longer available.']);
+        }
+
         $validated = $request->validate([
             'ticket_type_id' => 'required|exists:ticket_types,id',
             'quantity' => 'required|integer|min:1',

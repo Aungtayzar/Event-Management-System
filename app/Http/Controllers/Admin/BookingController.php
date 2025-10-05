@@ -83,7 +83,13 @@ class BookingController extends Controller
             'notes' => 'nullable|string|max:1000'
         ]);
 
+        $event = Event::findOrFail($validated['event_id']);
         $ticketType = TicketType::findOrFail($validated['ticket_type_id']);
+
+        // Check if event date is in the past (Admin can override but show warning)
+        if ($event->date < now()) {
+            return back()->withInput()->withErrors(['event' => 'Warning: This event has already passed. Are you sure you want to create a booking for a past event?']);
+        }
 
         // Check availability
         if ($ticketType->quantity < $validated['quantity']) {

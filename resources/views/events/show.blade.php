@@ -124,9 +124,32 @@
                                 Book Tickets
                             </h3>
 
+                            @if($event->isPast())
+                            <!-- Event has passed - Show message instead of booking form -->
+                            <div class="bg-gray-100 border border-gray-200 rounded-lg p-6 text-center">
+                                <svg class="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                <h4 class="text-lg font-semibold text-gray-700 mb-2">Event Has Ended</h4>
+                                <p class="text-gray-600 mb-4">This event took place on {{ \Carbon\Carbon::parse($event->date)->format('F d, Y \a\t g:i A') }} and booking is no longer available.</p>
+                                <p class="text-sm text-gray-500">Check out our other upcoming events!</p>
+                            </div>
+                            @else
+                            <!-- Event is upcoming - Show booking form -->
                             <form action="{{ route('bookings.store',$event) }}" method="POST" id="payment-form"
                                 class="space-y-4">
                                 @csrf
+
+                                <!-- Show validation errors -->
+                                @if ($errors->any())
+                                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-4">
+                                    <ul class="list-disc list-inside">
+                                        @foreach ($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                                @endif
 
                                 <!-- Ticket Type Selection -->
                                 <div class="space-y-2">
@@ -209,6 +232,7 @@
                                     <i class="fas fa-arrow-right ml-2"></i>
                                 </button>
                             </form>
+                            @endif
                         </div>
                         @else
                         <div class="pt-6 border-t border-gray-200">
@@ -334,6 +358,7 @@
 
         // Dynamic price calculation and availability display
         document.addEventListener('DOMContentLoaded', function() {
+            @if(!$event->isPast())
             const ticketSelect = document.getElementById('ticket_type_id');
             const quantityInput = document.getElementById('quantity');
             const totalPriceElement = document.getElementById('total-price');
@@ -443,6 +468,7 @@
             
             // Initial state
             updateTicketInfo();
+            @endif
         });
     </script>
 </x-layout>

@@ -36,4 +36,12 @@ class Event extends Model
     {
         return $this->hasMany(Booking::class);
     }
+
+    /**
+     * Check if the event date is in the past
+     */
+    public function isPast(): bool
+    {
+        return $this->date < now();
+    }
 }

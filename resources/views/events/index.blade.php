@@ -20,7 +20,7 @@
         <div class="container mx-auto relative z-20 -bottom-10">
             <div class="bg-white rounded-lg shadow-xl p-6">
                 <form action="{{ route('events.search') }}" method="GET" class="relative">
-                    <div class="grid grid-cols-1 md:grid-cols-6 gap-4">
+                    <div class="grid grid-cols-1 md:grid-cols-7 gap-4">
                         <div class="md:col-span-2">
                             <label for="search" class="block text-sm font-medium text-gray-700 mb-1">Keywords</label>
                             <div class="relative">
@@ -51,9 +51,17 @@
                         </div>
 
                         <div>
-                            <label for="date" class="block text-sm font-medium text-gray-700 mb-1">Date</label>
-                            <input type="date" name="date" id="date" value="{{ request('date') }}"
-                                class="shadow-sm border focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md outline-none p-2">
+                            <label for="date_from" class="block text-sm font-medium text-gray-700 mb-1">From Date</label>
+                            <input type="date" name="date_from" id="date_from" value="{{ request('date_from') }}"
+                                class="shadow-sm border focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md outline-none p-2"
+                                placeholder="Start date">
+                        </div>
+
+                        <div>
+                            <label for="date_to" class="block text-sm font-medium text-gray-700 mb-1">To Date</label>
+                            <input type="date" name="date_to" id="date_to" value="{{ request('date_to') }}"
+                                class="shadow-sm border focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md outline-none p-2"
+                                placeholder="End date">
                         </div>
 
                         <div>
@@ -132,8 +140,37 @@
         <div class="container mx-auto px-6">
             <div class="flex justify-between items-center mb-8">
                 <div>
-                    <h2 class="text-2xl font-bold text-gray-900">Upcoming Events</h2>
-                    <p class="text-gray-600 mt-1">Discover events that match your interests</p>
+                    <h2 class="text-2xl font-bold text-gray-900">
+                        @if(request()->anyFilled(['search', 'category_id', 'date_from', 'date_to', 'location', 'price']))
+                            Search Results
+                        @else
+                            Upcoming Events
+                        @endif
+                    </h2>
+                    <p class="text-gray-600 mt-1">
+                        @if(request()->anyFilled(['search', 'category_id', 'date_from', 'date_to', 'location', 'price']))
+                            @php
+                                $filters = [];
+                                if(request('search')) $filters[] = 'keyword: "' . request('search') . '"';
+                                if(request('category_id')) {
+                                    $category = $categories->find(request('category_id'));
+                                    if($category) $filters[] = 'category: ' . $category->name;
+                                }
+                                if(request('date_from') && request('date_to')) {
+                                    $filters[] = 'dates: ' . \Carbon\Carbon::parse(request('date_from'))->format('M j, Y') . ' - ' . \Carbon\Carbon::parse(request('date_to'))->format('M j, Y');
+                                } elseif(request('date_from')) {
+                                    $filters[] = 'from: ' . \Carbon\Carbon::parse(request('date_from'))->format('M j, Y');
+                                } elseif(request('date_to')) {
+                                    $filters[] = 'until: ' . \Carbon\Carbon::parse(request('date_to'))->format('M j, Y');
+                                }
+                                if(request('location')) $filters[] = 'location: "' . request('location') . '"';
+                                if(request('price')) $filters[] = 'price: ' . request('price');
+                            @endphp
+                            Filtered by {{ implode(', ', $filters) }}
+                        @else
+                            Discover events that match your interests
+                        @endif
+                    </p>
                 </div>
                 <div class="hidden md:block">
                     <div class="inline-flex bg-green-300 rounded-full shadow px-2 py-1">
@@ -149,15 +186,15 @@
                 @forelse($events as $event)
                 <div class="group">
                     <div
-                        class="bg-white rounded-xl shadow-sm overflow-hidden group-hover:shadow-md transition-all duration-300">
+                        class="bg-white rounded-xl shadow-sm overflow-hidden group-hover:shadow-md transition-all duration-300 {{ $event->isPast() ? 'opacity-75' : '' }}">
                         <div class="relative">
                             @if($event->banner_image)
                             <img src="{{ asset('storage/' . $event->banner_image) }}" alt="{{ $event->title }}"
-                                class="w-full h-56 object-cover transition-transform duration-500 group-hover:scale-105"
+                                class="w-full h-56 object-cover transition-transform duration-500 group-hover:scale-105 {{ $event->isPast() ? 'grayscale' : '' }}"
                                 onerror="this.src='{{ asset('storage/event-placeholder.jpg') }}';this.onerror='';">
                             @else
                             <div
-                                class="w-full h-56 bg-gradient-to-br from-indigo-500 to-purple-700 flex items-center justify-center">
+                                class="w-full h-56 bg-gradient-to-br from-indigo-500 to-purple-700 flex items-center justify-center {{ $event->isPast() ? 'grayscale' : '' }}">
                                 <span class="text-white text-xl font-bold">{{ $event->title }}</span>
                             </div>
                             @endif
@@ -170,8 +207,13 @@
                                 </span>
                             </div>
 
-                            <!-- Date Badge -->
+                            <!-- Date Badge or Past Event Badge -->
                             <div class="absolute top-4 right-4">
+                                @if($event->isPast())
+                                <div class="bg-gray-500 text-white rounded-lg px-3 py-2 text-center shadow-lg">
+                                    <span class="text-xs font-medium">EVENT ENDED</span>
+                                </div>
+                                @else
                                 <div
                                     class="bg-indigo-600 text-white rounded-lg overflow-hidden text-center w-16 shadow-lg">
                                     <div class="bg-indigo-700 py-1">
@@ -183,6 +225,7 @@
                                             \Carbon\Carbon::parse($event->date)->format('d') }}</span>
                                     </div>
                                 </div>
+                                @endif
                             </div>
                         </div>
 
@@ -190,6 +233,9 @@
                             <h3
                                 class="text-xl font-bold text-gray-800 mb-2 group-hover:text-indigo-600 transition-colors duration-200">
                                 {{ $event->title }}
+                                @if($event->isPast())
+                                <span class="text-sm text-gray-500 font-normal">(Past Event)</span>
+                                @endif
                             </h3>
 
                             <p class="text-gray-600 mb-5 line-clamp-2">{{
@@ -227,8 +273,8 @@
                                 </div>
 
                                 <a href="{{ route('events.show', $event->id) }}"
-                                    class="inline-flex items-center px-4 py-2 border border-indigo-600 text-sm font-medium rounded-md text-indigo-600 bg-white hover:bg-indigo-600 hover:text-white transition-colors duration-200">
-                                    View Details
+                                    class="inline-flex items-center px-4 py-2 border {{ $event->isPast() ? 'border-gray-400 text-gray-500' : 'border-indigo-600 text-indigo-600 hover:bg-indigo-600 hover:text-white' }} text-sm font-medium rounded-md bg-white transition-colors duration-200">
+                                    {{ $event->isPast() ? 'View Event' : 'View Details' }}
                                     <svg xmlns="http://www.w3.org/2000/svg"
                                         class="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform duration-200"
                                         fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -264,7 +310,7 @@
         </div>
     </div>
 
-    <!-- JavaScript for Advanced Filter Toggle -->
+    <!-- JavaScript for Advanced Filter Toggle and Date Range -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const advancedFilterToggle = document.getElementById('advancedFilterToggle');
@@ -284,6 +330,46 @@
                         }
                     }
                 });
+            }
+
+            // Date range validation
+            const dateFromInput = document.getElementById('date_from');
+            const dateToInput = document.getElementById('date_to');
+            
+            if (dateFromInput && dateToInput) {
+                // When from date changes, update min date for to date
+                dateFromInput.addEventListener('change', function() {
+                    if (this.value) {
+                        dateToInput.min = this.value;
+                        // If to date is before from date, clear it
+                        if (dateToInput.value && dateToInput.value < this.value) {
+                            dateToInput.value = '';
+                        }
+                    } else {
+                        dateToInput.min = '';
+                    }
+                });
+
+                // When to date changes, update max date for from date
+                dateToInput.addEventListener('change', function() {
+                    if (this.value) {
+                        dateFromInput.max = this.value;
+                        // If from date is after to date, clear it
+                        if (dateFromInput.value && dateFromInput.value > this.value) {
+                            dateFromInput.value = '';
+                        }
+                    } else {
+                        dateFromInput.max = '';
+                    }
+                });
+
+                // Initialize constraints if values are already set
+                if (dateFromInput.value) {
+                    dateToInput.min = dateFromInput.value;
+                }
+                if (dateToInput.value) {
+                    dateFromInput.max = dateToInput.value;
+                }
             }
         });
     </script>

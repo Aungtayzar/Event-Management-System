@@ -3,3 +3,4 @@
 3. I need to make seeder for tickettype. (completed)
 4. Need to add user management fuctionality in Admin panel. (completed)
 5. Event date is greater than today what should i do. (Important)
+6. Paginnation add. 

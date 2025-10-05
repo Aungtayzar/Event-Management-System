@@ -232,7 +232,17 @@ class EventsController extends Controller
             $query->where('category_id', $request->category_id);
         }
 
-        if ($request->filled('date')) {
+        // Handle date range filtering
+        if ($request->filled('date_from')) {
+            $query->whereDate('date', '>=', $request->date_from);
+        }
+
+        if ($request->filled('date_to')) {
+            $query->whereDate('date', '<=', $request->date_to);
+        }
+
+        // Legacy support for single date filter (if still used elsewhere)
+        if ($request->filled('date') && !$request->filled('date_from') && !$request->filled('date_to')) {
             $query->whereDate('date', $request->date);
         }
 
@@ -252,7 +262,7 @@ class EventsController extends Controller
             }
         }
 
-        $events = $query->with(['category', 'ticketTypes'])->get();
+        $events = $query->with(['category', 'ticketTypes'])->orderBy('date', 'asc')->get();
         $categories = Category::all();
 
         return view('events.index', compact('events', 'categories'));
